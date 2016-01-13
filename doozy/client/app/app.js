@@ -1,27 +1,23 @@
 angular.module('app', [
-  'directives.organizationCard',
-  'directives.projectCard',
-  'app.services',
-  'app.tasks',
-  'app.auth',
   'ui.router',
+  'directives.navBar',
+  'directives.organizationCard',
+  'directives.organizationDashboard',
+  'directives.projectCard',
+  'directives.projectDashboard',
+  'directives.taskDashboard',
+  'directives.taskDashboardItem',
+  'directives.taskDetail',
+  'directives.taskDetailItem',
+  'directives.taskManager',
+  'directives.userManager',
+  'app.services',
+  'app.landingCtrl',
+  'app.auth',
   'app.org',
   'app.projectAndTask',
-  'ngRoute',
-  'ngAnimate',
-  'ngMaterial',
-  'ngFx'
 ])
-.config(function($stateProvider, $httpProvider, $mdThemingProvider, $locationProvider) {
-  $mdThemingProvider.theme('default')
-    .primaryPalette('green')
-    .accentPalette('green', {
-      default: '800'
-    })
-    .warnPalette('deep-orange')
-    .backgroundPalette('green', {
-      default: '50'
-    });
+.config(function($stateProvider, $httpProvider, $locationProvider) {
 
   $stateProvider
     .state('signin', {
@@ -34,22 +30,23 @@ angular.module('app', [
       controller: 'AuthController',
       templateUrl: '/app/auth/signup.html'
     })
-    .state('user', {
-      url: '/user',
-      controller: 'TasksController',
-      templateUrl: 'app/tasks/tasks.html',
-      authenticate: true,
-    })
+    // .state('tasks', {
+    //   url: '/tasks',
+    //   controller: 'TasksController',
+    //   templateUrl: 'app/tasks/tasks.html',
+    //   authenticate: true,
+    // })
     .state('project', {
-      url: '/project/:projectId',
+      url: '/project',
       templateUrl: '/app/projectAndTask/projectAndTask.html',
       controller: 'ProjectAndTaskController',
+      params: {projectId: null, taskId: null},
       authenticate: true
     })
     .state('landing', {
       url: '/landing',
-      templateUrl: '/app/tasks/landing.html',
-      controller: 'TasksController',
+      templateUrl: '/app/landing/landing.html',
+      controller: 'LandingCtrl',
       authenticate: true
     })
     .state('org', {
@@ -99,11 +96,11 @@ angular.module('app', [
 .run(function ($rootScope, $location, $state, Auth) {
   $rootScope.$on('$stateChangeStart',
     function(event, toState, toParams, fromState, fromParams){
+      console.log('auth', Auth.isAuth());
       if(toState && toState.authenticate && !Auth.isAuth()) {
-        $state.go('signin');
+        $location.path('/');
       }
-      if(toState.name === 'signin' && Auth.isAuth()) {
-
+      else if(toState.name === 'signin' && Auth.isAuth()) {
         $location.path('/landing');
         $state.go('landing');
       }
