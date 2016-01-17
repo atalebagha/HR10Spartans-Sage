@@ -1,95 +1,35 @@
-<div flex layout="column" layout-align="center center">
-    <div flex-sm="100" flex-gt-sm="100" flex-gt-md="80" flex-gt-lg="80" id="maincontainer" class="md-whiteframe-z2">
-        <h1 style="text-align:center" class="signheader">
-  Sage
-  <p id="teamname"> {{pt.data.project.name}} </p>
-  </h1>
-        <!-- Signout button -->
-        <md-button class="md-raised md-primary dashboardbtn1" ui-sref="org">Back to Organizations</md-button>
-        <md-button class="md-raised md-primary dashboardbtn" ui-sref="landing">Dashboard</md-button>
-        <md-button class="md-raised md-primary logoutbtn" ng-click="pt.signout()">Sign Out</md-button>
-        <md-content id="taskdisplay" ng-cloak>
-            <!-- Add Task button -->
-            <section layout="row" layout-sm="column" layout-align="center center" ng-show='pt.showAddTaskButton'>
-                <md-button class="md-raised md-primary" ng-click="pt.showTaskForm=true; pt.showAddTaskButton=false">
-                    Add Task
-                </md-button>
-            </section>
-            <!-- Task Form -->
-            <md-content layout-padding ng-show='pt.showTaskForm' class="fx-zoom-normal fx-speed-500">
-                <md-icon id="closeFormBtn" ng-click="pt.resetTaskDetails()" aria-label="Close" md-svg-icon="/assets/clear_24px.svg">
-                </md-icon>
-                <br>
-                <form name="pt.taskForm">
-                    <md-input-container class="md-block">
-                        <label>Task</label>
-                        <input md-maxlength="50" required name="task" ng-model="pt.task.name">
-                        <div ng-messages="pt.projectForm.description.$error">
-                            <div ng-message="required">This is required.</div>
-                        </div>
-                    </md-input-container>
-                    <md-input-container class="md-block">
-                        <label>Description</label>
-                        <textarea ng-model="pt.task.description" rows="3" columns="1" md-maxlength="150" rows="5"></textarea>
-                    </md-input-container>
-                    <label>Project Members</label>
-                    <md-select ng-model="task.userId">
-                        <md-option value="">Unassigned</md-option>
-                        <md-option ng-repeat="user in pt.data.projectUsers" value="{{user._id}}">
-                            {{pt.user.username}}
-                        </md-option>
-                    </md-select>
-                    <section layout="row" layout-sm="column" layout-align="center center" layout-wrap="">
-                        <md-button class="button md-raised md-primary" ng-click="pt.submitTask(task);  pt.resetTaskDetails();">
-                            Submit
-                        </md-button>
-                    </section>
-                </form>
-            </md-content>
-            <!-- Task List -->
-            <md-content class='taskList'>
-                <!-- STAGING -->
-                <md-subheader class="md-no-sticky">Staging</md-subheader>
-                <md-list-item ng-repeat="task in pt.data.tasks | filter : stagingFilter">
-                    <!-- this <div ng-repeat> is a workaround that prevents the check box from being selected when the user clicks on the list item -->
-                    <div ng-repeat='n in [0]'>
-                        <md-checkbox ng-model="pt.task.isCompleted" ng-change="pt.updateTask(task)"></md-checkbox>
-                    </div>
-                    <p class="taskListItem fx-fade-normal" ng-click="pt.loadTaskDetails(task)" md-ink-ripple>
-                        {{ pt.task.name }}
-                    </p>
-                    <md-icon class="md-secondary" ng-click="pt.deleteTask(task)" aria-label="Delete" md-svg-icon="../assets/clear_24px.svg"></md-icon>
-                </md-list-item>
-                <md-divider></md-divider>
-                <!-- ASSIGNED -->
-                <md-subheader class="md-no-sticky">Assigned</md-subheader>
-                <md-list-item ng-repeat="task in pt.data.tasks | filter : assignedFilter">
-                    <!-- this <div ng-repeat> is a workaround that prevents the check box from being selected when the user clicks on the list item -->
-                    <div ng-repeat='n in [0]'>
-                        <md-checkbox ng-model="pt.task.isCompleted" ng-change="pt.updateTask(task)"></md-checkbox>
-                    </div>
-                    <p class="taskListItem" ng-click="pt.loadTaskDetails(task)" md-ink-ripple>
-                        {{ pt.task.name }}
-                        <span><b>Description: </b>{{pt.task.description}}</span>
-                        <span class="userdisplay">Assigned To <span ng-repeat="user in pt.task.users">{{ user.username }} | </span></span>
-                    </p>
-                    <md-icon class="md-secondary" ng-click="pt.deleteTask(task)" aria-label="Delete" md-svg-icon="/assets/clear_24px.svg"></md-icon>
-                </md-list-item>
-                <md-divider></md-divider>
-                <!-- COMPLETED -->
-                <md-subheader class="md-no-sticky">Complete</md-subheader>
-                <md-list-item ng-repeat="task in pt.data.tasks | filter : completedFilter">
-                    <!-- this <div ng-repeat> is a workaround that prevents the check box from being selected when the user clicks on the list item -->
-                    <div ng-repeat='n in [0]'>
-                        <md-checkbox ng-model="pt.task.isCompleted" ng-change="pt.updateTask(task)"></md-checkbox>
-                    </div>
-                    <p class="taskListItem" ng-click="pt.loadTaskDetails(task)" md-ink-ripple>
-                        {{ pt.task.name }}
-                        <span class="userdisplay">Assigned To <span ng-repeat="user in pt.task.users">{{ user.username }} | </span></span>
-                    </p>
-                    <md-icon class="md-secondary" ng-click="pt.deleteTask(task)" aria-label="Delete" md-svg-icon="/assets/clear_24px.svg"></md-icon>
-                </md-list-item>
-            </md-content>
-        </md-content>
-    </div>
+<div class="container">
+    <nav-bar></nav-bar>
+    
+    <section>
+        <h2>Project Name: {{data.project.name}}</h2>
+    </section>
+
+    <section>
+        <user-manager 
+        current-users="data.projectUsers" 
+        user-list="data.orgUsers" 
+        handle-submit="addUserToProject" 
+        handle-remove="removeUserFromProject">
+        </user-manager>
+    </section>
+    
+    <section>
+        <h4>Add Task</h4>
+        
+        <task-manager
+        task="data.task"
+        handle-submit="submitTask"
+        handle-remove="removeTask"
+        project-users="data.projectUsers"
+        ></task-manager>
+    </section>
+
+    <section>
+        <task-detail
+        task-list="data.project.tasks"
+        handle-task-edit="loadTaskDetails"
+        >
+        </task-detail>
+    </section>
 </div>

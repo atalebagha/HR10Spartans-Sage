@@ -4,7 +4,7 @@ angular.module('app.org', [])
   $scope.showAddOrgButton = true;
   $scope.showOrgForm = false;
 
-  $scope.user;
+  $scope.user = {};
   $scope.data = {};
   $scope.newOrg = {};
 
@@ -13,7 +13,7 @@ angular.module('app.org', [])
     if ($scope.newOrg) {
       $scope.newOrg.title = null;
       // reset the form validation
-      $scope.orgForm.$setUntouched();
+      //$scope.orgForm.$setUntouched();
     }
 
     // hide the task form
@@ -38,7 +38,6 @@ angular.module('app.org', [])
 
   $scope.populateUserData = function() {
     $scope.data.organization = $scope.user.organization;
-    console.log($scope.data);
   };
 
   $scope.newOrganization = function(data) {
@@ -48,7 +47,7 @@ angular.module('app.org', [])
         return Users.addOrganizationToUser({
           orgId: org._id,
           userId: $scope.user._id
-        })
+        });
       })
       .then(function() {
         $scope.resetOrgDetails();
